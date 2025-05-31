@@ -1,46 +1,21 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
-
 const app = express();
+const scraper = require('./scraper');
+
 const PORT = process.env.PORT || 3000;
 
-// Função que abre o navegador com o caminho correto no Render
-async function getBrowser() {
-  return await puppeteer.launch({
-    headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-}
-
-// Rota principal de teste
-app.get('/', (req, res) => {
-  res.send('✅ MeuCine Scraper Server está rodando!');
-});
-
-// Rota da API que extrai link de filme
 app.get('/api/filme', async (req, res) => {
-  const filmeUrl = req.query.url;
+  const url = req.query.url;
 
-  if (!filmeUrl) {
-    return res.status(400).json({ error: 'URL do filme não fornecida' });
+  if (!url) {
+    return res.status(400).json({ error: 'URL não fornecida' });
   }
 
   try {
-    const browser = await getBrowser();
-    const page = await browser.newPage();
-    await page.goto(filmeUrl, { waitUntil: 'domcontentloaded' });
-
-    // ⚠️ Ajuste conforme o site (aqui é exemplo genérico)
-    const movieLink = await page.evaluate(() => {
-      const video = document.querySelector('video');
-      return video ? video.src : null;
-    });
-
-    await browser.close();
+    const movieLink = await scraper(url);
 
     if (!movieLink) {
-      return res.status(404).json({ error: 'Link de vídeo não encontrado' });
+      return res.status(404).json({ error: 'Não foi possível extrair o link do vídeo' });
     }
 
     res.json({ stream_url: movieLink });

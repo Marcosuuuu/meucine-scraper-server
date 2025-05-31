@@ -1,11 +1,11 @@
 {
   "name": "meucine-scraper-server",
   "version": "1.0.0",
-  "description": "Servidor scraper para pegar links de vídeo",
+  "description": "Servidor scraper para pegar links .m3u8 do Cinegato",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "puppeteer install chrome"
+    "postinstall": "puppeteer install"
   },
   "dependencies": {
     "express": "^4.18.2",
