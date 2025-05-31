@@ -1,34 +1,22 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const scraper = require('./scraper');
+const scraper = require("./scraper");
 
-const PORT = process.env.PORT || 3000;
-
-app.get('/api/filme', async (req, res) => {
+app.get("/api/filme", async (req, res) => {
   const url = req.query.url;
-
-  if (!url) {
-    return res.status(400).json({ error: 'URL não fornecida' });
-  }
+  if (!url) return res.status(400).json({ error: "URL não fornecida" });
 
   try {
     const movieLink = await scraper(url);
-
-    if (!movieLink) {
-      return res.status(404).json({ error: 'Não foi possível extrair o link do vídeo' });
-    }
-
+    if (!movieLink) return res.status(404).json({ error: "Link não encontrado" });
     res.json({ stream_url: movieLink });
-
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: 'Erro ao extrair link do vídeo',
-      details: error.message
-    });
+    res.status(500).json({ error: "Erro ao extrair link", details: error.message });
   }
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log("Servidor rodando na porta " + PORT);
 });
