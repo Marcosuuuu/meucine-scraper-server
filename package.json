@@ -1,7 +1,7 @@
 {
   "name": "meucine-scraper-server",
   "version": "1.0.0",
-  "description": "Servidor scraper para pegar link m3u8 do Cinegato",
+  "description": "Servidor scraper para pegar link de vídeo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "puppeteer": "^21.3.8"
+    "puppeteer": "^24.0.0"
   }
 }

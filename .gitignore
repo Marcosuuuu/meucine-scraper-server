@@ -1,2 +1,8 @@
-.cache/
-node_modules/
+# Ignorar cache do Puppeteer
+.cache
+
+# Ignorar node_modules
+node_modules
+
+# Ignorar arquivos de log
+*.log
