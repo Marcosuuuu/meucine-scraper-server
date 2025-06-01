@@ -1,3 +1,3 @@
 module.exports = {
-  cacheDirectory: './.cache/puppeteer'
-}
+  cacheDirectory: "/opt/render/.cache/puppeteer"
+};
