@@ -1,38 +1,26 @@
 const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const cors = require('cors');
-
 const app = express();
-app.use(cors());
+const extrairFilemoon = require('./scraper/filemoon-puppeteer');
+const extrairPobreflix = require('./scraper/pobreflix-puppeteer');
 
-app.get('/filme/:titulo', async (req, res) => {
-  const titulo = req.params.titulo;
-  const url = `https://pobreflix.biz/?s=${encodeURIComponent(titulo)}`;
+app.get('/extrair', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.json({ erro: 'URL ausente' });
 
   try {
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
-    const linkFilme = $('.result-item a').first().attr('href');
-
-    if (!linkFilme) return res.status(404).json({ erro: 'Filme não encontrado' });
-
-    const { data: filmeData } = await axios.get(linkFilme);
-    const _$ = cheerio.load(filmeData);
-    const scriptTag = _$('script:contains(".m3u8")').html();
-    const match = scriptTag && scriptTag.match(/(https?:\/\/.*?\.m3u8)/);
-
-    if (match && match[1]) {
-      return res.json({ video: match[1] });
+    let resultado;
+    if (url.includes('filemoon') || url.includes('26efp')) {
+      resultado = await extrairFilemoon(url);
+    } else if (url.includes('pobreflixtv.lat')) {
+      resultado = await extrairPobreflix(url);
     } else {
-      return res.status(404).json({ erro: 'Link .m3u8 não encontrado' });
+      throw new Error('Site não suportado');
     }
+    return res.json(resultado);
   } catch (err) {
-    return res.status(500).json({ erro: 'Erro ao buscar filme' });
+    return res.json({ erro: err.message });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Servidor rodando em http://localhost:${port}`));
